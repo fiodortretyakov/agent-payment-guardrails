@@ -1,4 +1,4 @@
-import { PaymentIntent } from '../models/payment';
+import type { PaymentIntent } from '../models/payment';
 
 export class MockAgent {
   // Simulate the agent "thinking" and proposing a payment
@@ -8,7 +8,7 @@ export class MockAgent {
       currency: 'GBP',
       beneficiary: 'Apple Store London',
       category: 'equipment',
-      justification: 'Buying a new Macbook for the design team.'
+      justification: 'Buying a new Macbook for the design team.',
     };
   }
 }

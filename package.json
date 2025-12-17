@@ -6,7 +6,10 @@
   "scripts": {
     "start": "tsx src/index.ts",
     "dev": "tsx watch src/index.ts",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "format": "prettier --write \"src/**\" \"tests/**\" \"*.js\" \"*.ts\" \"jest.config.cjs\"",
+    "lint": "eslint --ext .ts src tests --fix",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [
     "ai",

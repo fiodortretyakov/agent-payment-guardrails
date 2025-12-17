@@ -1,4 +1,4 @@
-import type { PaymentIntent, EvaluationResult } from "../models/payment";
+import type { PaymentIntent, EvaluationResult } from '../models/payment';
 
 export interface PaymentPolicy {
   name: string;
@@ -18,6 +18,6 @@ export class PolicyEngine {
         };
       }
     }
-    return { approved: true, reason: "All policies passed." };
+    return { approved: true, reason: 'All policies passed.' };
   }
 }
