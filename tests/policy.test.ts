@@ -84,3 +84,205 @@ describe('End-to-End Guardrail Validation', () => {
     expect(secondResult.reason).toContain('Duplicate Payment');
   });
 });
+
+describe('MaxAmountPolicy', () => {
+  const policy = new MaxAmountPolicy(1000);
+
+  test('should ALLOW amounts below or equal to limit', () => {
+    const intent = {
+      idempotencyKey: 'test-key',
+      amount: 500,
+      currency: 'GBP',
+      beneficiary: 'Test',
+      category: 'equipment',
+      justification: 'Test purchase',
+    } as any;
+
+    const result = policy.validate(intent);
+    expect(result.allowed).toBe(true);
+    expect(result.error).toBeUndefined();
+  });
+
+  test('should BLOCK amounts exceeding limit', () => {
+    const intent = {
+      idempotencyKey: 'test-key',
+      amount: 1500,
+      currency: 'GBP',
+      beneficiary: 'Test',
+      category: 'equipment',
+      justification: 'Test purchase',
+    } as any;
+
+    const result = policy.validate(intent);
+    expect(result.allowed).toBe(false);
+    expect(result.error).toContain('exceeds limit of 1000');
+  });
+});
+
+describe('CategoryPolicy', () => {
+  const policy = new CategoryPolicy();
+
+  test('should ALLOW approved categories', () => {
+    const intent = {
+      idempotencyKey: 'test-key',
+      amount: 500,
+      currency: 'GBP',
+      beneficiary: 'Test',
+      category: 'equipment',
+      justification: 'Test purchase',
+    } as any;
+
+    const result = policy.validate(intent);
+    expect(result.allowed).toBe(true);
+    expect(result.error).toBeUndefined();
+  });
+
+  test('should BLOCK non-approved categories', () => {
+    const intent = {
+      idempotencyKey: 'test-key',
+      amount: 500,
+      currency: 'GBP',
+      beneficiary: 'Test',
+      category: 'services',
+      justification: 'Test purchase',
+    } as any;
+
+    const result = policy.validate(intent);
+    expect(result.allowed).toBe(false);
+    expect(result.error).toContain('not in the approved list');
+  });
+});
+
+describe('PolicyEngine Built-in Checks', () => {
+  const engine = new PolicyEngine([]); // No policies, just built-ins
+
+  test('should BLOCK intents with HTML in justification', () => {
+    const maliciousIntent = {
+      idempotencyKey: 'test-key',
+      amount: 500,
+      currency: 'GBP',
+      beneficiary: 'Test',
+      category: 'equipment',
+      justification: 'Test purchase <script>alert("xss")</script>',
+    } as any;
+
+    const result = engine.evaluate(maliciousIntent);
+    expect(result.approved).toBe(false);
+    expect(result.reason).toContain('Security Violation: HTML detected');
+  });
+
+  test('should ALLOW intents without HTML', () => {
+    const cleanIntent = {
+      idempotencyKey: 'test-key',
+      amount: 500,
+      currency: 'GBP',
+      beneficiary: 'Test',
+      category: 'equipment',
+      justification: 'Clean test purchase',
+    } as any;
+
+    const result = engine.evaluate(cleanIntent);
+    expect(result.approved).toBe(true);
+  });
+});
+
+describe('MaxAmountPolicy', () => {
+  const policy = new MaxAmountPolicy(1000);
+
+  test('should ALLOW amounts below or equal to limit', () => {
+    const intent = {
+      idempotencyKey: 'test-key',
+      amount: 500,
+      currency: 'GBP',
+      beneficiary: 'Test',
+      category: 'equipment',
+      justification: 'Test purchase',
+    } as any;
+
+    const result = policy.validate(intent);
+    expect(result.allowed).toBe(true);
+    expect(result.error).toBeUndefined();
+  });
+
+  test('should BLOCK amounts exceeding limit', () => {
+    const intent = {
+      idempotencyKey: 'test-key',
+      amount: 1500,
+      currency: 'GBP',
+      beneficiary: 'Test',
+      category: 'equipment',
+      justification: 'Test purchase',
+    } as any;
+
+    const result = policy.validate(intent);
+    expect(result.allowed).toBe(false);
+    expect(result.error).toContain('exceeds limit of 1000');
+  });
+});
+
+describe('CategoryPolicy', () => {
+  const policy = new CategoryPolicy();
+
+  test('should ALLOW approved categories', () => {
+    const intent = {
+      idempotencyKey: 'test-key',
+      amount: 500,
+      currency: 'GBP',
+      beneficiary: 'Test',
+      category: 'equipment',
+      justification: 'Test purchase',
+    } as any;
+
+    const result = policy.validate(intent);
+    expect(result.allowed).toBe(true);
+    expect(result.error).toBeUndefined();
+  });
+
+  test('should BLOCK non-approved categories', () => {
+    const intent = {
+      idempotencyKey: 'test-key',
+      amount: 500,
+      currency: 'GBP',
+      beneficiary: 'Test',
+      category: 'services',
+      justification: 'Test purchase',
+    } as any;
+
+    const result = policy.validate(intent);
+    expect(result.allowed).toBe(false);
+    expect(result.error).toContain('not in the approved list');
+  });
+});
+
+describe('PolicyEngine Built-in Checks', () => {
+  const engine = new PolicyEngine([]); // No policies, just built-ins
+
+  test('should BLOCK intents with HTML in justification', () => {
+    const maliciousIntent = {
+      idempotencyKey: 'test-key',
+      amount: 500,
+      currency: 'GBP',
+      beneficiary: 'Test',
+      category: 'equipment',
+      justification: 'Test purchase <script>alert("xss")</script>',
+    } as any;
+
+    const result = engine.evaluate(maliciousIntent);
+    expect(result.approved).toBe(false);
+    expect(result.reason).toContain('Security Violation: HTML detected');
+  });
+
+  test('should ALLOW intents without HTML', () => {
+    const cleanIntent = {
+      idempotencyKey: 'test-key',
+      amount: 500,
+      currency: 'GBP',
+      beneficiary: 'Test',
+      category: 'equipment',
+      justification: 'Clean test purchase',
+    } as any;
+
+    const result = engine.evaluate(cleanIntent);
+    expect(result.approved).toBe(true);
+  });
+});
