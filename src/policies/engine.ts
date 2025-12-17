@@ -1,4 +1,4 @@
-import { PaymentIntent, EvaluationResult } from '../models/payment';
+import type { PaymentIntent, EvaluationResult } from '../models/payment';
 
 export interface PaymentPolicy {
   name: string;

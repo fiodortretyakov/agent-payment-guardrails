@@ -1,5 +1,5 @@
-import { PaymentPolicy } from './engine';
-import { PaymentIntent } from '../models/payment';
+import type { PaymentPolicy } from './engine';
+import type { PaymentIntent } from '../models/payment';
 
 export class MaxAmountPolicy implements PaymentPolicy {
   name = "MaxAmountLimit";

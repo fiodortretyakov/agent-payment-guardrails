@@ -1,4 +1,4 @@
-import { PaymentIntent } from '../models/payment';
+import type { PaymentIntent } from '../models/payment';
 
 export interface TransactionReceipt {
   id: string;
@@ -9,7 +9,7 @@ export interface TransactionReceipt {
 export class MockPaymentService {
   async execute(intent: PaymentIntent): Promise<TransactionReceipt> {
     console.log(`🏦 Connecting to Bank API for ${intent.currency} ${intent.amount}...`);
-    
+
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 800));
 
