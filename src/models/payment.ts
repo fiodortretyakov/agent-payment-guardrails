@@ -1,15 +1,18 @@
 import { z } from 'zod';
 
+// 1. Define the "Safe Shape" of a payment intent
 export const PaymentIntentSchema = z.object({
-  amount: z.number().positive().describe("Amount in minor units (e.g., pence)"),
+  amount: z.number().positive().describe("The total cost of the item in minor units"),
   currency: z.enum(['GBP', 'USD', 'EUR']),
-  beneficiary: z.string().min(1),
-  category: z.enum(['equipment', 'travel', 'software', 'services']),
-  justification: z.string().min(10),
+  beneficiary: z.string().min(1).describe("The entity being paid"),
+  category: z.enum(['equipment', 'software', 'travel', 'services', 'other']),
+  justification: z.string().min(10).describe("Why this purchase is necessary"),
 });
 
+// 2. Export the Type (inferred from Schema)
 export type PaymentIntent = z.infer<typeof PaymentIntentSchema>;
 
+// 3. Define the Result Interface
 export interface EvaluationResult {
   approved: boolean;
   reason: string;
