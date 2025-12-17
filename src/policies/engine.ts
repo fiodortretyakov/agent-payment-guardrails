@@ -1,4 +1,4 @@
-import type { PaymentIntent, EvaluationResult } from '../models/payment';
+import type { PaymentIntent, EvaluationResult } from "../models/payment";
 
 export interface PaymentPolicy {
   name: string;
@@ -12,7 +12,10 @@ export class PolicyEngine {
     for (const policy of this.policies) {
       const result = policy.validate(intent);
       if (!result.allowed) {
-        return { approved: false, reason: `Policy '${policy.name}' violated: ${result.error}` };
+        return {
+          approved: false,
+          reason: `Policy '${policy.name}' violated: ${result.error}`,
+        };
       }
     }
     return { approved: true, reason: "All policies passed." };

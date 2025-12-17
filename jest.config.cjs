@@ -1,8 +1,7 @@
 module.exports = {
-  testEnvironment: 'node',
+  testEnvironment: "node",
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', { useESM: true }]
+    "^.+\\.(ts|tsx)$": ["ts-jest", { useESM: true }],
   },
-  extensionsToTreatAsEsm: ['.ts']
+  extensionsToTreatAsEsm: [".ts"],
 };
-
