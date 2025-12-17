@@ -1,39 +1,62 @@
 import { PolicyEngine } from '../src/policies/engine';
 import { MaxAmountPolicy } from '../src/policies/amountPolicy';
 import { CategoryPolicy } from '../src/policies/categoryPolicy';
-import type { PaymentIntent } from '../src/models/payment';
+import { PaymentIntentSchema } from '../src/models/payment';
 
-describe('Safety Guardrails', () => {
-  // A standard valid payment to use in tests
-  const validIntent: PaymentIntent = {
-    amount: 100,
-    currency: 'GBP',
-    beneficiary: 'Test Vendor',
-    category: 'equipment',
-    justification: 'Unit test',
-  };
+describe('End-to-End Guardrail Validation', () => {
+  const engine = new PolicyEngine([new MaxAmountPolicy(1000), new CategoryPolicy()]);
 
-  test('should BLOCK payments over the limit', () => {
-    const engine = new PolicyEngine([new MaxAmountPolicy(500)]);
-    const result = engine.evaluate({ ...validIntent, amount: 1000 });
+  // Case 1: The Happy Path
+  test('✅ should APPROVE a valid standard request', () => {
+    const valid = {
+      amount: 500,
+      currency: 'GBP',
+      beneficiary: 'AWS',
+      category: 'software',
+      justification: 'Cloud hosting for the main app',
+    };
+    const result = engine.evaluate(valid as any);
+    expect(result.approved).toBe(true);
+  });
 
+  // Case 2: Guardrail - Amount Limit
+  test('❌ should BLOCK payment exceeding MaxAmountPolicy', () => {
+    const expensive = {
+      amount: 1001,
+      currency: 'GBP',
+      beneficiary: 'Luxury Cars Ltd',
+      category: 'equipment',
+      justification: 'New CEO company car',
+    };
+    const result = engine.evaluate(expensive as any);
     expect(result.approved).toBe(false);
     expect(result.reason).toContain('exceeds limit');
   });
 
-  test('should APPROVE payments within the limit', () => {
-    const engine = new PolicyEngine([new MaxAmountPolicy(500)]);
-    const result = engine.evaluate({ ...validIntent, amount: 499 });
-
-    expect(result.approved).toBe(true);
-  });
-
-  test('should BLOCK forbidden categories', () => {
-    const engine = new PolicyEngine([new CategoryPolicy()]);
-    // @ts-ignore - forcing a bad category to test the logic layer
-    const result = engine.evaluate({ ...validIntent, category: 'gambling' });
-
+  // Case 3: Guardrail - Category Restriction
+  test('❌ should BLOCK payment for non-approved categories', () => {
+    const restricted = {
+      amount: 50,
+      currency: 'GBP',
+      beneficiary: 'Local Pub',
+      category: 'services', // Not in our 'equipment/software/travel' list
+      justification: 'Team drinks',
+    };
+    const result = engine.evaluate(restricted as any);
     expect(result.approved).toBe(false);
     expect(result.reason).toContain('not in the approved list');
+  });
+
+  // Case 4: Schema Validation (The "Zod" Test)
+  test('🚨 should THROW error if agent sends invalid data types', () => {
+    const malformed = {
+      amount: 'five hundred', // String instead of number
+      currency: 'XYZ', // Invalid enum
+      beneficiary: '',
+      category: 'unknown',
+    };
+
+    const parseResult = PaymentIntentSchema.safeParse(malformed);
+    expect(parseResult.success).toBe(false);
   });
 });
