@@ -6,7 +6,7 @@
   "scripts": {
     "start": "tsx src/index.ts",
     "dev": "tsx watch src/index.ts",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test": "jest",
     "format": "prettier --write \"src/**\" \"tests/**\" \"*.js\" \"*.ts\" \"jest.config.cjs\"",
     "lint": "eslint --ext .ts src tests --fix",
     "typecheck": "tsc --noEmit"
@@ -28,5 +28,8 @@
     "ts-jest": "^29.4.6",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "glob": "^10.5.0"
   }
 }
