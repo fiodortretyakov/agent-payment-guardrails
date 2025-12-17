@@ -1,6 +1,13 @@
 {
   "name": "Agent Payments Guardrails",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:25-bookworm",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  
+  "features": {
+    // This feature will overrule the image and install Node 25 for you
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "25"
+    }
+  },
   "customizations": {
     "vscode": {
       "extensions": [
