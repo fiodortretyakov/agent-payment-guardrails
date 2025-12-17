@@ -12,7 +12,8 @@ async function main() {
   
   // Define Guardrails (e.g., Max limit of 1000 GBP)
   const policyEngine = new PolicyEngine([
-    new MaxAmountPolicy(1000) 
+    new MaxAmountPolicy(1000),
+    new CategoryPolicy()
   ]);
 
   try {
