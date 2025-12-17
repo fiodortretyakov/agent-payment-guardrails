@@ -1,0 +1,29 @@
+{
+  "name": "agent-payments-guardrails",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Safe agentic payment orchestration for Ralio assessment",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "dev": "tsx watch src/index.ts",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "keywords": [
+    "ai",
+    "fintech",
+    "guardrails"
+  ],
+  "author": "Founding Engineer Candidate",
+  "license": "MIT",
+  "dependencies": {
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.0.3",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
