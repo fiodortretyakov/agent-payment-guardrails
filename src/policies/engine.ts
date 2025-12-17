@@ -1,4 +1,5 @@
 import type { PaymentIntent, EvaluationResult } from '../models/payment';
+import sanitizeHtml from 'sanitize-html';
 
 export interface PaymentPolicy {
   name: string;
@@ -19,8 +20,11 @@ export class PolicyEngine {
       };
     }
 
-    // Safety check: Basic string sanitization
-    const cleanJustification = intent.justification.replace(/<[^>]*>?/gm, '');
+    // Safety check: Sanitize HTML to prevent XSS
+    const cleanJustification = sanitizeHtml(intent.justification, {
+      allowedTags: [],
+      allowedAttributes: {},
+    });
     if (cleanJustification !== intent.justification) {
       return { approved: false, reason: 'Security Violation: HTML detected in justification' };
     }

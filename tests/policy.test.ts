@@ -1,7 +1,10 @@
 import { PolicyEngine } from '../src/policies/engine';
 import { MaxAmountPolicy } from '../src/policies/amountPolicy';
 import { CategoryPolicy } from '../src/policies/categoryPolicy';
+import { TimeBasedPolicy } from '../src/policies/timePolicy';
 import { PaymentIntentSchema } from '../src/models/payment';
+import { MockAgent } from '../src/agent/mock';
+import { MockPaymentService } from '../src/payment/service';
 
 describe('End-to-End Guardrail Validation', () => {
   const engine = new PolicyEngine([new MaxAmountPolicy(1000), new CategoryPolicy()]);
@@ -284,5 +287,66 @@ describe('PolicyEngine Built-in Checks', () => {
 
     const result = engine.evaluate(cleanIntent);
     expect(result.approved).toBe(true);
+  });
+});
+
+describe('Integration Test - Full Flow', () => {
+  test('should run the full agent → policy → service flow', async () => {
+    const agent = new MockAgent();
+    const paymentService = new MockPaymentService();
+    const policyEngine = new PolicyEngine([new MaxAmountPolicy(1000), new CategoryPolicy()]);
+
+    const intent = await agent.generateIntent();
+    const decision = policyEngine.evaluate(intent);
+
+    expect(decision.approved).toBe(true); // Assuming the mock intent is valid
+
+    const receipt = await paymentService.execute(intent);
+    expect(receipt.status).toBe('SUCCESS');
+    expect(receipt.id).toBeDefined();
+  });
+});
+
+describe('TimeBasedPolicy', () => {
+  const policy = new TimeBasedPolicy();
+
+  test('should ALLOW during business hours', () => {
+    // Mock the time to be within business hours
+    jest.spyOn(Date.prototype, 'getUTCHours').mockReturnValue(12); // Noon
+
+    const intent = {
+      idempotencyKey: 'test-key',
+      amount: 500,
+      currency: 'GBP',
+      beneficiary: 'Test',
+      category: 'equipment',
+      justification: 'Test purchase',
+    } as any;
+
+    const result = policy.validate(intent);
+    expect(result.allowed).toBe(true);
+    expect(result.error).toBeUndefined();
+
+    jest.restoreAllMocks();
+  });
+
+  test('should BLOCK outside business hours', () => {
+    // Mock the time to be outside business hours
+    jest.spyOn(Date.prototype, 'getUTCHours').mockReturnValue(20); // 8 PM
+
+    const intent = {
+      idempotencyKey: 'test-key',
+      amount: 500,
+      currency: 'GBP',
+      beneficiary: 'Test',
+      category: 'equipment',
+      justification: 'Test purchase',
+    } as any;
+
+    const result = policy.validate(intent);
+    expect(result.allowed).toBe(false);
+    expect(result.error).toContain('business hours');
+
+    jest.restoreAllMocks();
   });
 });

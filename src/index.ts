@@ -2,40 +2,56 @@ import { MockAgent } from './agent/mock';
 import { PolicyEngine } from './policies/engine';
 import { MaxAmountPolicy } from './policies/amountPolicy';
 import { CategoryPolicy } from './policies/categoryPolicy';
+import { TimeBasedPolicy } from './policies/timePolicy';
 import { MockPaymentService } from './payment/service';
+import winston from 'winston';
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    }),
+  ],
+});
 
 async function main() {
-  console.log('🚀 Starting Safe Agentic Payment System...\n');
+  logger.info('🚀 Starting Safe Agentic Payment System...');
 
   // 1. Setup Dependencies
   const agent = new MockAgent();
   const paymentService = new MockPaymentService();
 
   // Define Guardrails (e.g., Max limit of 1000 GBP)
-  const policyEngine = new PolicyEngine([new MaxAmountPolicy(1000), new CategoryPolicy()]);
+  const policyEngine = new PolicyEngine([
+    new MaxAmountPolicy(1000),
+    new CategoryPolicy(),
+    new TimeBasedPolicy(),
+  ]);
 
   try {
     // 2. Agent proposes a payment
-    console.log('🤖 Agent is generating payment intent...');
+    logger.info('🤖 Agent is generating payment intent...');
     const intent = await agent.generateIntent();
-    console.log('📋 Intent received:', intent);
+    logger.info('📋 Intent received:', { intent });
 
     // 3. System evaluates guardrails
-    console.log('\n🛡️  Running Policy Engine...');
+    logger.info('🛡️ Running Policy Engine...');
     const decision = policyEngine.evaluate(intent);
 
     if (decision.approved) {
-      console.log('✅ APPROVED. Proceeding to execution.');
+      logger.info('✅ APPROVED. Proceeding to execution.');
 
       // 4. Execute Payment
       const receipt = await paymentService.execute(intent);
-      console.log('🎉 Payment Successful!', receipt);
+      logger.info('🎉 Payment Successful!', { receipt });
     } else {
-      console.warn('🛑 BLOCKED. Reason:', decision.reason);
+      logger.warn('🛑 BLOCKED. Reason:', { reason: decision.reason });
       // Requirement #4: Feedback Loop would happen here
     }
   } catch (error) {
-    console.error('💥 System Error:', error);
+    logger.error('💥 System Error:', { error });
   }
 }
 
