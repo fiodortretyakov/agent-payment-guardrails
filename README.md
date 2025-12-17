@@ -81,6 +81,17 @@ The Policy Engine is designed using the **Strategy Pattern**.
 ### 3. Fail-Close Default
 * **Assumption:** The system assumes a "Fail-Close" security model. If a policy service is unreachable or throws an unknown error, the transaction is strictly denied rather than risking an unverified payment.
 
+## 🛡️ Security & Safety Measures
+
+### 1. Floating Point Protection
+To avoid IEEE 754 rounding errors common in JavaScript, the system strictly uses **integer math**. All amounts are processed in minor units (e.g., pence/cents).
+
+### 2. Idempotency Guarantees
+Every `PaymentIntent` requires a UUID `idempotencyKey`. This prevents the "Double Spend" problem if the AI Agent retries a request due to a timeout.
+
+### 3. Fail-Safe Defaults
+The `PolicyEngine` utilizes a **deny-by-default** approach. If an unknown error occurs during evaluation, the transaction is automatically blocked.
+
 ---
 
 ## 🔮 Future Improvements (The Roadmap)

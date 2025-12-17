@@ -9,6 +9,7 @@ describe('End-to-End Guardrail Validation', () => {
   // Case 1: The Happy Path
   test('✅ should APPROVE a valid standard request', () => {
     const valid = {
+      idempotencyKey: '11111111-1111-1111-1111-111111111111',
       amount: 500,
       currency: 'GBP',
       beneficiary: 'AWS',
@@ -22,6 +23,7 @@ describe('End-to-End Guardrail Validation', () => {
   // Case 2: Guardrail - Amount Limit
   test('❌ should BLOCK payment exceeding MaxAmountPolicy', () => {
     const expensive = {
+      idempotencyKey: '22222222-2222-2222-2222-222222222222',
       amount: 1001,
       currency: 'GBP',
       beneficiary: 'Luxury Cars Ltd',
@@ -36,6 +38,7 @@ describe('End-to-End Guardrail Validation', () => {
   // Case 3: Guardrail - Category Restriction
   test('❌ should BLOCK payment for non-approved categories', () => {
     const restricted = {
+      idempotencyKey: '33333333-3333-3333-3333-333333333333',
       amount: 50,
       currency: 'GBP',
       beneficiary: 'Local Pub',
@@ -58,5 +61,26 @@ describe('End-to-End Guardrail Validation', () => {
 
     const parseResult = PaymentIntentSchema.safeParse(malformed);
     expect(parseResult.success).toBe(false);
+  });
+
+  // Case 5: Idempotency Check
+  test('🔄 should BLOCK duplicate idempotencyKey', () => {
+    const duplicateIntent = {
+      idempotencyKey: '44444444-4444-4444-4444-444444444444',
+      amount: 200,
+      currency: 'GBP',
+      beneficiary: 'Office Supplies',
+      category: 'equipment',
+      justification: 'Buying stationery for the team',
+    };
+
+    // First evaluation should pass
+    const firstResult = engine.evaluate(duplicateIntent as any);
+    expect(firstResult.approved).toBe(true);
+
+    // Second evaluation with same key should be blocked
+    const secondResult = engine.evaluate(duplicateIntent as any);
+    expect(secondResult.approved).toBe(false);
+    expect(secondResult.reason).toContain('Duplicate Payment');
   });
 });
