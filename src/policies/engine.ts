@@ -18,7 +18,7 @@ export class PolicyEngine {
   private processedKeys = new Set<string>();
 
   evaluate(intent: PaymentIntent): FinalEvaluationResult {
-// Generate a unique identifier for this specific decision
+    // Generate a unique identifier for this specific decision
     const evaluationId = randomUUID();
 
     // Start with a clean audit trail
@@ -64,13 +64,14 @@ export class PolicyEngine {
           id: evaluationId,
           auditTrail: auditTrail,
         };
-      } else {
-        auditTrail.push(`Policy '${policy.name}' PASSED.`);
       }
 
       // 2. If any policy flags it for human, remember that
       if (result.decision === PolicyDecision.REQUIRES_HUMAN_APPROVAL) {
         finalRequiresApproval = true;
+        auditTrail.push(`Policy '${policy.name}' requires human approval.`);
+      } else {
+        auditTrail.push(`Policy '${policy.name}' approved.`);
       }
     }
 
