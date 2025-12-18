@@ -43,20 +43,27 @@ async function main() {
 
     // 3. System evaluates guardrails
     logger.info('🛡️ Running Policy Engine...');
-    const decision = policyEngine.evaluate(intent);
+    const result = policyEngine.evaluate(intent);
 
-    if (decision.decision === PolicyDecision.APPROVED) {
-      logger.info('✅ APPROVED. Proceeding to execution.');
+    switch (result.decision) {
+      case PolicyDecision.APPROVED: {
+        logger.info('✅ APPROVED. Proceeding to execution.');
 
-      // 4. Execute Payment
-      const receipt = await paymentService.execute(intent);
-      await agent.setReceipt(receipt.id);
-      logger.info('🎉 Payment Successful!', { receipt });
-    } else if (decision.decision === PolicyDecision.REQUIRES_HUMAN_APPROVAL) {
-      logger.info('⏸️ PENDING: This exceeds the autonomous threshold. Sending for approval...');
-      logger.info('⚠️ REQUIRES HUMAN APPROVAL. Reason:', { reason: decision.reason });
-    } else {
-      logger.warn('🛑 BLOCKED. Reason:', { reason: decision.reason });
+        // 4. Execute Payment
+        const receipt = await paymentService.execute(intent);
+        await agent.setReceipt(receipt.id);
+        logger.info('🎉 Payment Successful!', { receipt });
+        break;
+      }
+
+      case PolicyDecision.REQUIRES_HUMAN_APPROVAL:
+        logger.info('⏸️ PENDING: This exceeds the autonomous threshold. Sending for approval...');
+        logger.info('⚠️ REQUIRES HUMAN APPROVAL. Reason:', { reason: result.reason });
+        break;
+
+      case PolicyDecision.DENIED:
+        logger.warn('🛑 BLOCKED. Reason:', { reason: result.reason });
+        break;
     }
   } catch (error) {
     logger.error('💥 System Error:', { error });
