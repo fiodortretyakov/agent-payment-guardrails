@@ -46,6 +46,8 @@ export default [
     },
     rules: {
       ...tseslint.configs.recommended.rules,
+      '@typescript-eslint/no-explicit-any': 'warn',
+      'no-console': 'off', // We want logs for our simulations
     },
   },
   {
