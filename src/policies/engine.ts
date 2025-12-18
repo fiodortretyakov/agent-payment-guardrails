@@ -3,6 +3,8 @@ import {
   type EvaluationResult,
   PolicyDecision,
   type FinalEvaluationResult,
+  type AuditEntry,
+  AuditActor,
 } from '../models/payment';
 import { randomUUID } from 'crypto';
 import sanitizeHtml from 'sanitize-html';
@@ -22,7 +24,9 @@ export class PolicyEngine {
     const evaluationId = randomUUID();
 
     // Start with a clean audit trail
-    const auditTrail: string[] = [`Evaluation started: ${evaluationId}`];
+    const auditTrail: AuditEntry[] = [
+      this.createEntry(AuditActor.SYSTEM, `Evaluation started: ${evaluationId}`),
+    ];
 
     // Check Idempotency first
     if (this.processedKeys.has(intent.idempotencyKey)) {
@@ -33,7 +37,7 @@ export class PolicyEngine {
         auditTrail: auditTrail,
       };
     } else {
-      auditTrail.push('Idempotency check passed.');
+      auditTrail.push(this.createEntry(AuditActor.SYSTEM, 'Idempotency check passed.'));
     }
 
     // Safety check: Sanitize HTML to prevent XSS
@@ -49,7 +53,7 @@ export class PolicyEngine {
         auditTrail: auditTrail,
       };
     } else {
-      auditTrail.push('Sanitization check passed.');
+      auditTrail.push(this.createEntry(AuditActor.SYSTEM, 'Sanitization check passed.'));
     }
 
     let finalRequiresApproval = false;
@@ -69,9 +73,11 @@ export class PolicyEngine {
       // 2. If any policy flags it for human, remember that
       if (result.decision === PolicyDecision.REQUIRES_HUMAN_APPROVAL) {
         finalRequiresApproval = true;
-        auditTrail.push(`Policy '${policy.name}' requires human approval.`);
+        auditTrail.push(
+          this.createEntry(AuditActor.SYSTEM, `Policy '${policy.name}' requires human approval.`)
+        );
       } else {
-        auditTrail.push(`Policy '${policy.name}' approved.`);
+        auditTrail.push(this.createEntry(AuditActor.SYSTEM, `Policy '${policy.name}' approved.`));
       }
     }
 
@@ -84,6 +90,14 @@ export class PolicyEngine {
       reason: finalRequiresApproval ? 'Pending human sign-off' : 'Auto-approved',
       id: evaluationId,
       auditTrail: auditTrail,
+    };
+  }
+
+  private createEntry(actor: AuditActor, action: string): AuditEntry {
+    return {
+      timestamp: new Date().toISOString(),
+      actor,
+      action,
     };
   }
 }

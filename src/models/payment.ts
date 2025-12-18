@@ -26,5 +26,18 @@ export interface EvaluationResult {
 
 export interface FinalEvaluationResult extends EvaluationResult {
   id: UUID;
-  auditTrail: string[];
+  auditTrail: AuditEntry[];
+}
+
+export enum AuditActor {
+  SYSTEM = 'SYSTEM',
+  AGENT = 'AGENT',
+  HUMAN = 'HUMAN',
+}
+
+export interface AuditEntry {
+  timestamp: string;
+  actor: AuditActor;
+  action: string;
+  details?: string;
 }
