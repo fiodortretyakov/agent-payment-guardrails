@@ -1,3 +1,4 @@
+import type { UUID } from 'crypto';
 import { z } from 'zod';
 
 export const PaymentIntentSchema = z.object({
@@ -24,6 +25,6 @@ export interface EvaluationResult {
 }
 
 export interface FinalEvaluationResult extends EvaluationResult {
-  id: string;
+  id: UUID;
   auditTrail: string[];
 }

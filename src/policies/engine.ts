@@ -4,6 +4,7 @@ import {
   PolicyDecision,
   type FinalEvaluationResult,
 } from '../models/payment';
+import { randomUUID } from 'crypto';
 import sanitizeHtml from 'sanitize-html';
 
 export interface PaymentPolicy {
@@ -17,18 +18,22 @@ export class PolicyEngine {
   private processedKeys = new Set<string>();
 
   evaluate(intent: PaymentIntent): FinalEvaluationResult {
-    const trail: string[] = [];
+// Generate a unique identifier for this specific decision
+    const evaluationId = randomUUID();
+
+    // Start with a clean audit trail
+    const auditTrail: string[] = [`Evaluation started: ${evaluationId}`];
 
     // Check Idempotency first
     if (this.processedKeys.has(intent.idempotencyKey)) {
       return {
         decision: PolicyDecision.DENIED,
         reason: 'Duplicate Payment: This idempotencyKey has already been processed.',
-        id: intent.idempotencyKey,
-        auditTrail: trail,
+        id: evaluationId,
+        auditTrail: auditTrail,
       };
     } else {
-      trail.push('Idempotency check passed.');
+      auditTrail.push('Idempotency check passed.');
     }
 
     // Safety check: Sanitize HTML to prevent XSS
@@ -40,11 +45,11 @@ export class PolicyEngine {
       return {
         decision: PolicyDecision.DENIED,
         reason: 'Security Violation: HTML detected in justification',
-        id: intent.idempotencyKey,
-        auditTrail: trail,
+        id: evaluationId,
+        auditTrail: auditTrail,
       };
     } else {
-      trail.push('Sanitization check passed.');
+      auditTrail.push('Sanitization check passed.');
     }
 
     let finalRequiresApproval = false;
@@ -56,11 +61,11 @@ export class PolicyEngine {
         return {
           decision: PolicyDecision.DENIED,
           reason: `Policy '${policy.name}' violated: ${result.reason}`,
-          id: intent.idempotencyKey,
-          auditTrail: trail,
+          id: evaluationId,
+          auditTrail: auditTrail,
         };
       } else {
-        trail.push(`Policy '${policy.name}' PASSED.`);
+        auditTrail.push(`Policy '${policy.name}' PASSED.`);
       }
 
       // 2. If any policy flags it for human, remember that
@@ -76,8 +81,8 @@ export class PolicyEngine {
         ? PolicyDecision.REQUIRES_HUMAN_APPROVAL
         : PolicyDecision.APPROVED,
       reason: finalRequiresApproval ? 'Pending human sign-off' : 'Auto-approved',
-      id: intent.idempotencyKey,
-      auditTrail: trail,
+      id: evaluationId,
+      auditTrail: auditTrail,
     };
   }
 }
