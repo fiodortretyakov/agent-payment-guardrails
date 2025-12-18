@@ -1,13 +1,6 @@
 {
   "name": "Agent Payments Guardrails",
   "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
-  
-  "features": {
-    // This feature will overrule the image and install Node 25 for you
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "25"
-    }
-  },
   "customizations": {
     "vscode": {
       "extensions": [
@@ -29,13 +22,20 @@
           "source.fixAll.eslint": "explicit"
         },
         "files.insertFinalNewline": true,
-        "files.trimTrailingWhitespace": true
+        "files.trimTrailingWhitespace": true,
+        "git.autofetch": true,
+        "git.enableSmartCommit": true,
+        "git.confirmSync": false,
+        "editor.formatOnType": false
       }
     }
   },
   "postCreateCommand": "bash .devcontainer/setup.sh",
   "remoteUser": "node",
   "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "25"
+    }
   }
 }
