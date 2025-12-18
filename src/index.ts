@@ -4,6 +4,7 @@ import { MaxAmountPolicy } from './policies/amountPolicy';
 import { DailyBudgetPolicy } from './policies/budgetPolicy';
 import { CategoryPolicy } from './policies/categoryPolicy';
 import { TimeBasedPolicy } from './policies/timePolicy';
+import { ThresholdPolicy } from './policies/thresholdPolicy';
 import { MockPaymentService } from './payment/service';
 import winston from 'winston';
 
@@ -30,6 +31,7 @@ async function main() {
     new DailyBudgetPolicy(3000),
     new CategoryPolicy(),
     new TimeBasedPolicy(),
+    new ThresholdPolicy(1000),
   ]);
 
   try {
@@ -43,16 +45,14 @@ async function main() {
     const decision = policyEngine.evaluate(intent);
 
     if (decision.approved) {
-      if (decision.requiresHumanApproval) {
-        console.log('⏸️ PENDING: This exceeds the autonomous threshold. Sending for approval...');
-        logger.info('⚠️ REQUIRES HUMAN APPROVAL. Reason:', { reason: decision.reason });
-      } else {
-        logger.info('✅ APPROVED. Proceeding to execution.');
+      logger.info('✅ APPROVED. Proceeding to execution.');
 
-        // 4. Execute Payment
-        const receipt = await paymentService.execute(intent);
-        logger.info('🎉 Payment Successful!', { receipt });
-      }
+      // 4. Execute Payment
+      const receipt = await paymentService.execute(intent);
+      logger.info('🎉 Payment Successful!', { receipt });
+    } else if (decision.requiresHumanApproval) {
+      console.log('⏸️ PENDING: This exceeds the autonomous threshold. Sending for approval...');
+      logger.info('⚠️ REQUIRES HUMAN APPROVAL. Reason:', { reason: decision.reason });
     } else {
       logger.warn('🛑 BLOCKED. Reason:', { reason: decision.reason });
     }

@@ -9,7 +9,7 @@ export class ThresholdPolicy implements PaymentPolicy {
   validate(intent: PaymentIntent) {
     if (intent.amount >= this.threshold) {
       return {
-        allowed: true, // It's still a "valid" intent
+        allowed: false,
         requiresHumanApproval: true,
         error: `Transaction of £${intent.amount} exceeds autonomous threshold of £${this.threshold}.`,
       };
