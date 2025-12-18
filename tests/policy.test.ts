@@ -3,6 +3,7 @@ import { MaxAmountPolicy } from '../src/policies/amountPolicy';
 import { CategoryPolicy } from '../src/policies/categoryPolicy';
 import { TimeBasedPolicy } from '../src/policies/timePolicy';
 import { PaymentIntentSchema } from '../src/models/payment';
+import { ThresholdPolicy } from '../src/policies/thresholdPolicy';
 
 describe('End-to-End Guardrail Validation', () => {
   const engine = new PolicyEngine([new MaxAmountPolicy(1000), new CategoryPolicy()]);
@@ -329,5 +330,30 @@ describe('TimeBasedPolicy', () => {
     expect(result.reason).toContain('business hours');
 
     jest.restoreAllMocks();
+  });
+
+  test('⚠️ should flag for Human Approval if amount is between £500 and £1000', () => {
+    const policy = new ThresholdPolicy(500);
+    const midRangePayment = {
+      amount: 600,
+      category: 'software',
+      // ... other fields
+    };
+
+    const result = policy.validate(midRangePayment as any);
+    expect(result.requiresHumanApproval).toBe(true);
+  });
+
+  test('⚠️ should flag for Human Approval if amount is between £500 and £1000', () => {
+    const policy = new ThresholdPolicy(500);
+    const midRangePayment = {
+      amount: 400,
+      category: 'software',
+      // ... other fields
+    };
+
+    const result = policy.validate(midRangePayment as any);
+    expect(result.approved).toBe(true);
+    expect(result.requiresHumanApproval).toBe(false);
   });
 });
