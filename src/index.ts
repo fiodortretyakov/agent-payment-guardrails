@@ -49,6 +49,7 @@ async function main() {
 
       // 4. Execute Payment
       const receipt = await paymentService.execute(intent);
+      await agent.setReceipt(receipt.id);
       logger.info('🎉 Payment Successful!', { receipt });
     } else if (decision.requiresHumanApproval) {
       logger.info('⏸️ PENDING: This exceeds the autonomous threshold. Sending for approval...');

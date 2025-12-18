@@ -1,4 +1,4 @@
-import type { PaymentIntent, EvaluationResult, FinalExecutionResult } from '../models/payment';
+import type { PaymentIntent, EvaluationResult } from '../models/payment';
 import sanitizeHtml from 'sanitize-html';
 
 export interface PaymentPolicy {
@@ -11,7 +11,7 @@ export class PolicyEngine {
   // Use a Set to track processed keys in memory
   private processedKeys = new Set<string>();
 
-  evaluate(intent: PaymentIntent): FinalExecutionResult {
+  evaluate(intent: PaymentIntent): EvaluationResult {
     // Check Idempotency first
     if (this.processedKeys.has(intent.idempotencyKey)) {
       return {

@@ -14,4 +14,8 @@ export class MockAgent {
       justification: 'Buying a new Macbook for the design team.',
     };
   }
+  async setReceipt(receiptId: string): Promise<void> {
+    // Simulate storing the receipt
+    console.log(`🧾 Storing receipt with ID: ${receiptId}`);
+  }
 }

@@ -17,8 +17,3 @@ export interface EvaluationResult {
   requiresHumanApproval?: boolean;
   reason?: string;
 }
-
-// 2. The Extended Interface (Adding the ID)
-export interface FinalExecutionResult extends EvaluationResult {
-  transactionId?: string;
-}
