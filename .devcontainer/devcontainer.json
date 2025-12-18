@@ -17,6 +17,9 @@
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "editor.tabSize": 2,
+        "editor.wordWrap": "on",
+        "editor.wordWrapColumn": 80,
+        "editor.wrappingIndent": "indent",
         "typescript.tsdk": "node_modules/typescript/lib",
         "editor.codeActionsOnSave": {
           "source.fixAll.eslint": "explicit"
