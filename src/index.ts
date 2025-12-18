@@ -51,7 +51,7 @@ async function main() {
       const receipt = await paymentService.execute(intent);
       logger.info('🎉 Payment Successful!', { receipt });
     } else if (decision.requiresHumanApproval) {
-      console.log('⏸️ PENDING: This exceeds the autonomous threshold. Sending for approval...');
+      logger.info('⏸️ PENDING: This exceeds the autonomous threshold. Sending for approval...');
       logger.info('⚠️ REQUIRES HUMAN APPROVAL. Reason:', { reason: decision.reason });
     } else {
       logger.warn('🛑 BLOCKED. Reason:', { reason: decision.reason });
