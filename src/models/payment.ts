@@ -23,6 +23,6 @@ export interface EvaluationResult {
   reason?: string;
 }
 
-export interface FinalExecutionResult extends EvaluationResult {
+export interface FinalEvaluationResult extends EvaluationResult {
   id: string;
 }

@@ -1,4 +1,9 @@
-import { type PaymentIntent, type EvaluationResult, PolicyDecision } from '../models/payment';
+import {
+  type PaymentIntent,
+  type EvaluationResult,
+  PolicyDecision,
+  type FinalEvaluationResult,
+} from '../models/payment';
 import sanitizeHtml from 'sanitize-html';
 
 export interface PaymentPolicy {
@@ -11,12 +16,13 @@ export class PolicyEngine {
   // Use a Set to track processed keys in memory
   private processedKeys = new Set<string>();
 
-  evaluate(intent: PaymentIntent): EvaluationResult {
+  evaluate(intent: PaymentIntent): FinalEvaluationResult {
     // Check Idempotency first
     if (this.processedKeys.has(intent.idempotencyKey)) {
       return {
         decision: PolicyDecision.DENIED,
         reason: 'Duplicate Payment: This idempotencyKey has already been processed.',
+        id: intent.idempotencyKey,
       };
     }
 
@@ -29,6 +35,7 @@ export class PolicyEngine {
       return {
         decision: PolicyDecision.DENIED,
         reason: 'Security Violation: HTML detected in justification',
+        id: intent.idempotencyKey,
       };
     }
 
@@ -41,6 +48,7 @@ export class PolicyEngine {
         return {
           decision: PolicyDecision.DENIED,
           reason: `Policy '${policy.name}' violated: ${result.reason}`,
+          id: intent.idempotencyKey,
         };
       }
 
@@ -57,6 +65,7 @@ export class PolicyEngine {
         ? PolicyDecision.REQUIRES_HUMAN_APPROVAL
         : PolicyDecision.APPROVED,
       reason: finalRequiresApproval ? 'Pending human sign-off' : 'Auto-approved',
+      id: intent.idempotencyKey,
     };
   }
 }
