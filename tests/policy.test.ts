@@ -2,7 +2,7 @@ import { PolicyEngine } from '../src/policies/engine';
 import { MaxAmountPolicy } from '../src/policies/amountPolicy';
 import { CategoryPolicy } from '../src/policies/categoryPolicy';
 import { TimeBasedPolicy } from '../src/policies/timePolicy';
-import { PaymentIntentSchema } from '../src/models/payment';
+import { PaymentIntentSchema, PolicyDecision } from '../src/models/payment';
 import { ThresholdPolicy } from '../src/policies/thresholdPolicy';
 
 describe('End-to-End Guardrail Validation', () => {
@@ -19,7 +19,7 @@ describe('End-to-End Guardrail Validation', () => {
       justification: 'Cloud hosting for the main app',
     };
     const result = engine.evaluate(valid as any);
-    expect(result.approved).toBe(true);
+    expect(result.decision).toBe(PolicyDecision.APPROVED);
   });
 
   // Case 2: Guardrail - Amount Limit
@@ -33,7 +33,7 @@ describe('End-to-End Guardrail Validation', () => {
       justification: 'New CEO company car',
     };
     const result = engine.evaluate(expensive as any);
-    expect(result.approved).toBe(false);
+    expect(result.decision).toBe(PolicyDecision.DENIED);
     expect(result.reason).toContain('exceeds limit');
   });
 
@@ -48,7 +48,7 @@ describe('End-to-End Guardrail Validation', () => {
       justification: 'Team drinks',
     };
     const result = engine.evaluate(restricted as any);
-    expect(result.approved).toBe(false);
+    expect(result.decision).toBe(PolicyDecision.DENIED);
     expect(result.reason).toContain('not in the approved list');
   });
 
@@ -78,11 +78,11 @@ describe('End-to-End Guardrail Validation', () => {
 
     // First evaluation should pass
     const firstResult = engine.evaluate(duplicateIntent as any);
-    expect(firstResult.approved).toBe(true);
+    expect(firstResult.decision).toBe(PolicyDecision.APPROVED);
 
     // Second evaluation with same key should be blocked
     const secondResult = engine.evaluate(duplicateIntent as any);
-    expect(secondResult.approved).toBe(false);
+    expect(secondResult.decision).toBe(PolicyDecision.DENIED);
     expect(secondResult.reason).toContain('Duplicate Payment');
   });
 });
@@ -101,7 +101,7 @@ describe('MaxAmountPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.approved).toBe(true);
+    expect(result.decision).toBe(PolicyDecision.APPROVED);
     expect(result.reason).toBeUndefined();
   });
 
@@ -116,7 +116,7 @@ describe('MaxAmountPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.approved).toBe(false);
+    expect(result.decision).toBe(PolicyDecision.DENIED);
     expect(result.reason).toContain('exceeds limit of 1000');
   });
 });
@@ -135,7 +135,7 @@ describe('CategoryPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.approved).toBe(true);
+    expect(result.decision).toBe(PolicyDecision.APPROVED);
     expect(result.reason).toBeUndefined();
   });
 
@@ -150,7 +150,7 @@ describe('CategoryPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.approved).toBe(false);
+    expect(result.decision).toBe(PolicyDecision.DENIED);
     expect(result.reason).toContain('not in the approved list');
   });
 });
@@ -169,7 +169,7 @@ describe('PolicyEngine Built-in Checks', () => {
     } as any;
 
     const result = engine.evaluate(maliciousIntent);
-    expect(result.approved).toBe(false);
+    expect(result.decision).toBe(PolicyDecision.DENIED);
     expect(result.reason).toContain('Security Violation: HTML detected');
   });
 
@@ -184,7 +184,7 @@ describe('PolicyEngine Built-in Checks', () => {
     } as any;
 
     const result = engine.evaluate(cleanIntent);
-    expect(result.approved).toBe(true);
+    expect(result.decision).toBe(PolicyDecision.APPROVED);
   });
 });
 
@@ -202,7 +202,7 @@ describe('MaxAmountPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.approved).toBe(true);
+    expect(result.decision).toBe(PolicyDecision.APPROVED);
     expect(result.reason).toBeUndefined();
   });
 
@@ -217,7 +217,7 @@ describe('MaxAmountPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.approved).toBe(false);
+    expect(result.decision).toBe(PolicyDecision.DENIED);
     expect(result.reason).toContain('exceeds limit of 1000');
   });
 });
@@ -236,7 +236,7 @@ describe('CategoryPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.approved).toBe(true);
+    expect(result.decision).toBe(PolicyDecision.APPROVED);
     expect(result.reason).toBeUndefined();
   });
 
@@ -251,7 +251,7 @@ describe('CategoryPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.approved).toBe(false);
+    expect(result.decision).toBe(PolicyDecision.DENIED);
     expect(result.reason).toContain('not in the approved list');
   });
 });
@@ -270,7 +270,7 @@ describe('PolicyEngine Built-in Checks', () => {
     } as any;
 
     const result = engine.evaluate(maliciousIntent);
-    expect(result.approved).toBe(false);
+    expect(result.decision).toBe(PolicyDecision.DENIED);
     expect(result.reason).toContain('Security Violation: HTML detected');
   });
 
@@ -285,7 +285,7 @@ describe('PolicyEngine Built-in Checks', () => {
     } as any;
 
     const result = engine.evaluate(cleanIntent);
-    expect(result.approved).toBe(true);
+    expect(result.decision).toBe(PolicyDecision.APPROVED);
   });
 });
 
@@ -306,7 +306,7 @@ describe('TimeBasedPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.approved).toBe(true);
+    expect(result.decision).toBe(PolicyDecision.APPROVED);
     expect(result.reason).toBeUndefined();
 
     jest.restoreAllMocks();
@@ -326,7 +326,7 @@ describe('TimeBasedPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.approved).toBe(false);
+    expect(result.decision).toBe(PolicyDecision.DENIED);
     expect(result.reason).toContain('business hours');
 
     jest.restoreAllMocks();
@@ -341,7 +341,7 @@ describe('TimeBasedPolicy', () => {
     };
 
     const result = policy.validate(midRangePayment as any);
-    expect(result.requiresHumanApproval).toBe(true);
+    expect(result.decision).toBe(PolicyDecision.REQUIRES_HUMAN_APPROVAL);
   });
 
   test('⚠️ should flag for Human Approval if amount is between £500 and £1000', () => {
@@ -353,7 +353,6 @@ describe('TimeBasedPolicy', () => {
     };
 
     const result = policy.validate(midRangePayment as any);
-    expect(result.approved).toBe(true);
-    expect(result.requiresHumanApproval).toBe(false);
+    expect(result.decision).toBe(PolicyDecision.APPROVED);
   });
 });

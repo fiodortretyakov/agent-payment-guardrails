@@ -7,6 +7,7 @@ import { TimeBasedPolicy } from './policies/timePolicy';
 import { ThresholdPolicy } from './policies/thresholdPolicy';
 import { MockPaymentService } from './payment/service';
 import winston from 'winston';
+import { PolicyDecision } from './models/payment';
 
 const logger = winston.createLogger({
   level: 'info',
@@ -44,14 +45,14 @@ async function main() {
     logger.info('🛡️ Running Policy Engine...');
     const decision = policyEngine.evaluate(intent);
 
-    if (decision.approved) {
+    if (decision.decision === PolicyDecision.APPROVED) {
       logger.info('✅ APPROVED. Proceeding to execution.');
 
       // 4. Execute Payment
       const receipt = await paymentService.execute(intent);
       await agent.setReceipt(receipt.id);
       logger.info('🎉 Payment Successful!', { receipt });
-    } else if (decision.requiresHumanApproval) {
+    } else if (decision.decision === PolicyDecision.REQUIRES_HUMAN_APPROVAL) {
       logger.info('⏸️ PENDING: This exceeds the autonomous threshold. Sending for approval...');
       logger.info('⚠️ REQUIRES HUMAN APPROVAL. Reason:', { reason: decision.reason });
     } else {

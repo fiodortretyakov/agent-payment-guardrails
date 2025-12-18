@@ -1,5 +1,5 @@
 import type { PaymentPolicy } from './engine';
-import type { EvaluationResult, PaymentIntent } from '../models/payment';
+import { PolicyDecision, type EvaluationResult, type PaymentIntent } from '../models/payment';
 
 export class CategoryPolicy implements PaymentPolicy {
   name = 'AllowedCategories';
@@ -11,10 +11,10 @@ export class CategoryPolicy implements PaymentPolicy {
   validate(intent: PaymentIntent): EvaluationResult {
     if (!this.allowedCategories.has(intent.category)) {
       return {
-        approved: false,
+        decision: PolicyDecision.DENIED,
         reason: `Category '${intent.category}' is not in the approved list.`,
       };
     }
-    return { approved: true };
+    return { decision: PolicyDecision.APPROVED };
   }
 }

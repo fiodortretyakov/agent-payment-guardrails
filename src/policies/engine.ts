@@ -1,4 +1,4 @@
-import type { PaymentIntent, EvaluationResult } from '../models/payment';
+import { type PaymentIntent, type EvaluationResult, PolicyDecision } from '../models/payment';
 import sanitizeHtml from 'sanitize-html';
 
 export interface PaymentPolicy {
@@ -15,7 +15,7 @@ export class PolicyEngine {
     // Check Idempotency first
     if (this.processedKeys.has(intent.idempotencyKey)) {
       return {
-        approved: false,
+        decision: PolicyDecision.DENIED,
         reason: 'Duplicate Payment: This idempotencyKey has already been processed.',
       };
     }
@@ -27,7 +27,7 @@ export class PolicyEngine {
     });
     if (cleanJustification !== intent.justification) {
       return {
-        approved: false,
+        decision: PolicyDecision.DENIED,
         reason: 'Security Violation: HTML detected in justification',
       };
     }
@@ -37,15 +37,15 @@ export class PolicyEngine {
     for (const policy of this.policies) {
       const result = policy.validate(intent);
       // 1. If any policy blocks it, stop immediately
-      if (!result.approved) {
+      if (result.decision === PolicyDecision.DENIED) {
         return {
-          approved: false,
+          decision: PolicyDecision.DENIED,
           reason: `Policy '${policy.name}' violated: ${result.reason}`,
         };
       }
 
       // 2. If any policy flags it for human, remember that
-      if (result.requiresHumanApproval) {
+      if (result.decision === PolicyDecision.REQUIRES_HUMAN_APPROVAL) {
         finalRequiresApproval = true;
       }
     }
@@ -53,8 +53,9 @@ export class PolicyEngine {
     // If all pass, "commit" the key
     this.processedKeys.add(intent.idempotencyKey);
     return {
-      approved: !finalRequiresApproval,
-      requiresHumanApproval: finalRequiresApproval,
+      decision: finalRequiresApproval
+        ? PolicyDecision.REQUIRES_HUMAN_APPROVAL
+        : PolicyDecision.APPROVED,
       reason: finalRequiresApproval ? 'Pending human sign-off' : 'Auto-approved',
     };
   }

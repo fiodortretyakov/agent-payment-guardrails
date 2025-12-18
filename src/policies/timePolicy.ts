@@ -1,5 +1,5 @@
 import type { PaymentPolicy } from './engine';
-import type { EvaluationResult, PaymentIntent } from '../models/payment';
+import { PolicyDecision, type EvaluationResult, type PaymentIntent } from '../models/payment';
 
 export class TimeBasedPolicy implements PaymentPolicy {
   name = 'TimeBasedLimit';
@@ -15,10 +15,10 @@ export class TimeBasedPolicy implements PaymentPolicy {
   validate(_intent: PaymentIntent): EvaluationResult {
     if (!this.isBusinessHours()) {
       return {
-        approved: false,
+        decision: PolicyDecision.DENIED,
         reason: 'Payments are only allowed during business hours (9 AM - 5 PM GMT)',
       };
     }
-    return { approved: true };
+    return { decision: PolicyDecision.APPROVED };
   }
 }

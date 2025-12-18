@@ -10,10 +10,19 @@ export const PaymentIntentSchema = z.object({
   justification: z.string().min(10).describe('Why this purchase is necessary'),
 });
 
+export enum PolicyDecision {
+  APPROVED = 'APPROVED',
+  DENIED = 'DENIED',
+  REQUIRES_HUMAN_APPROVAL = 'REQUIRES_HUMAN_APPROVAL',
+}
+
 export type PaymentIntent = z.infer<typeof PaymentIntentSchema>;
 
 export interface EvaluationResult {
-  approved?: boolean;
-  requiresHumanApproval?: boolean;
+  decision: PolicyDecision;
   reason?: string;
+}
+
+export interface FinalExecutionResult extends EvaluationResult {
+  id: string;
 }
