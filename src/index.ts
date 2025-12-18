@@ -1,6 +1,7 @@
 import { MockAgent } from './agent/mock';
 import { PolicyEngine } from './policies/engine';
 import { MaxAmountPolicy } from './policies/amountPolicy';
+import { DailyBudgetPolicy } from './policies/budgetPolicy';
 import { CategoryPolicy } from './policies/categoryPolicy';
 import { TimeBasedPolicy } from './policies/timePolicy';
 import { MockPaymentService } from './payment/service';
@@ -26,6 +27,7 @@ async function main() {
   // Define Guardrails (e.g., Max limit of 1000 GBP)
   const policyEngine = new PolicyEngine([
     new MaxAmountPolicy(1000),
+    new DailyBudgetPolicy(3000),
     new CategoryPolicy(),
     new TimeBasedPolicy(),
   ]);
