@@ -3,6 +3,7 @@ import { z } from 'zod';
 // 1. Define the "Safe Shape" of a payment intent
 export const PaymentIntentSchema = z.object({
   idempotencyKey: z.string().min(1).describe('Unique key to prevent duplicate payments'),
+  goal: z.string().min(5).describe("The high-level objective provided to the agent"),
   amount: z.number().positive().describe('The total cost of the item in minor units'),
   currency: z.enum(['GBP', 'USD', 'EUR']),
   beneficiary: z.string().min(1).describe('The entity being paid'),
