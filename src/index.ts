@@ -7,7 +7,6 @@ import { TimeBasedPolicy } from './policies/timePolicy';
 import { ThresholdPolicy } from './policies/thresholdPolicy';
 import { MockPaymentService } from './payment/service';
 import winston from 'winston';
-import type { FinalExecutionResult } from './models/payment';
 
 const logger = winston.createLogger({
   level: 'info',
