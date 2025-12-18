@@ -25,4 +25,5 @@ export interface EvaluationResult {
 
 export interface FinalEvaluationResult extends EvaluationResult {
   id: string;
+  auditTrail: string[];
 }

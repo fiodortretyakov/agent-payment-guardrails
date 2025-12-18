@@ -17,13 +17,18 @@ export class PolicyEngine {
   private processedKeys = new Set<string>();
 
   evaluate(intent: PaymentIntent): FinalEvaluationResult {
+    const trail: string[] = [];
+
     // Check Idempotency first
     if (this.processedKeys.has(intent.idempotencyKey)) {
       return {
         decision: PolicyDecision.DENIED,
         reason: 'Duplicate Payment: This idempotencyKey has already been processed.',
         id: intent.idempotencyKey,
+        auditTrail: trail,
       };
+    } else {
+      trail.push('Idempotency check passed.');
     }
 
     // Safety check: Sanitize HTML to prevent XSS
@@ -36,7 +41,10 @@ export class PolicyEngine {
         decision: PolicyDecision.DENIED,
         reason: 'Security Violation: HTML detected in justification',
         id: intent.idempotencyKey,
+        auditTrail: trail,
       };
+    } else {
+      trail.push('Sanitization check passed.');
     }
 
     let finalRequiresApproval = false;
@@ -49,7 +57,10 @@ export class PolicyEngine {
           decision: PolicyDecision.DENIED,
           reason: `Policy '${policy.name}' violated: ${result.reason}`,
           id: intent.idempotencyKey,
+          auditTrail: trail,
         };
+      } else {
+        trail.push(`Policy '${policy.name}' PASSED.`);
       }
 
       // 2. If any policy flags it for human, remember that
@@ -66,6 +77,7 @@ export class PolicyEngine {
         : PolicyDecision.APPROVED,
       reason: finalRequiresApproval ? 'Pending human sign-off' : 'Auto-approved',
       id: intent.idempotencyKey,
+      auditTrail: trail,
     };
   }
 }

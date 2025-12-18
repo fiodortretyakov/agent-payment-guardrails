@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/fiodortretyakov/agent-payment-guardrails/actions/workflows/ci.yml/badge.svg)](https://github.com/fiodortretyakov/agent-payment-guardrails/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/fiodortretyakov/agent-payment-guardrails/graph/badge.svg?token=7JUE7ZODDF)](https://codecov.io/gh/fiodortretyakov/agent-payment-guardrails)
+![Node Version](https://img.shields.io/badge/node-25-green)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
 A safe, policy-driven orchestration system for autonomous AI agents. This repository implements a **"Guardrails First"** architecture, ensuring that AI-generated payment intents are validated against strict financial policies before any transaction is executed.
 
