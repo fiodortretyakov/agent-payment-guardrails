@@ -1,0 +1,6 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 80% # Minimum acceptable coverage
+        threshold: 1% # Allow 1% drop before failing

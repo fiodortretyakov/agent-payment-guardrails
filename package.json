@@ -6,7 +6,7 @@
   "scripts": {
     "start": "tsx src/index.ts",
     "dev": "tsx watch src/index.ts",
-    "test": "jest",
+    "test": "jest --coverage",
     "format": "prettier --write \"src/**\" \"tests/**\" \"*.js\" \"*.ts\" \"jest.config.cjs\"",
     "lint": "eslint --ext .ts src tests --fix",
     "lint:fix": "eslint . --fix",
