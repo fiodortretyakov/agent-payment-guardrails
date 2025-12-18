@@ -1,20 +1,22 @@
 import type { PaymentPolicy } from './engine';
-import type { PaymentIntent } from '../models/payment';
+import type { EvaluationResult, PaymentIntent } from '../models/payment';
 
 export class ThresholdPolicy implements PaymentPolicy {
   name = 'HumanApprovalThreshold';
 
   constructor(private threshold: number) {}
 
-  validate(intent: PaymentIntent) {
+  validate(intent: PaymentIntent): EvaluationResult {
     if (intent.amount >= this.threshold) {
       return {
-        allowed: false,
         requiresHumanApproval: true,
-        error: `Transaction of £${intent.amount} exceeds autonomous threshold of £${this.threshold}.`,
+        reason: `Transaction of £${intent.amount} exceeds autonomous threshold of £${this.threshold}.`,
       };
     }
 
-    return { allowed: true, requiresHumanApproval: false };
+    return {
+      approved: true,
+      requiresHumanApproval: false,
+    };
   }
 }

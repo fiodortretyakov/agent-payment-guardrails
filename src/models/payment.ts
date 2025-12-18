@@ -10,13 +10,15 @@ export const PaymentIntentSchema = z.object({
   justification: z.string().min(10).describe('Why this purchase is necessary'),
 });
 
-
 export type PaymentIntent = z.infer<typeof PaymentIntentSchema>;
 
-
 export interface EvaluationResult {
-  approved: boolean;
+  approved?: boolean;
   requiresHumanApproval?: boolean;
-  reason: string;
+  reason?: string;
+}
+
+// 2. The Extended Interface (Adding the ID)
+export interface FinalExecutionResult extends EvaluationResult {
   transactionId?: string;
 }

@@ -1,5 +1,5 @@
 import type { PaymentPolicy } from './engine';
-import type { PaymentIntent } from '../models/payment';
+import type { EvaluationResult, PaymentIntent } from '../models/payment';
 
 export class DailyBudgetPolicy implements PaymentPolicy {
   name = 'DailyBudgetLimit';
@@ -7,14 +7,14 @@ export class DailyBudgetPolicy implements PaymentPolicy {
 
   constructor(private dailyLimit: number) {}
 
-  validate(intent: PaymentIntent) {
+  validate(intent: PaymentIntent): EvaluationResult {
     if (this.currentSpent + intent.amount > this.dailyLimit) {
       return {
-        allowed: false,
-        error: `Daily budget exceeded. Remaining: ${this.dailyLimit - this.currentSpent}`,
+        approved: false,
+        reason: `Daily budget exceeded. Remaining: ${this.dailyLimit - this.currentSpent}`,
       };
     }
     this.currentSpent += intent.amount; // In reality, only update after SUCCESS
-    return { allowed: true };
+    return { approved: true };
   }
 }

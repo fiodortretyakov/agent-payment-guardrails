@@ -1,5 +1,5 @@
 import type { PaymentPolicy } from './engine';
-import type { PaymentIntent } from '../models/payment';
+import type { EvaluationResult, PaymentIntent } from '../models/payment';
 
 export class TimeBasedPolicy implements PaymentPolicy {
   name = 'TimeBasedLimit';
@@ -12,13 +12,13 @@ export class TimeBasedPolicy implements PaymentPolicy {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  validate(_intent: PaymentIntent) {
+  validate(_intent: PaymentIntent): EvaluationResult {
     if (!this.isBusinessHours()) {
       return {
-        allowed: false,
-        error: 'Payments are only allowed during business hours (9 AM - 5 PM GMT)',
+        approved: false,
+        reason: 'Payments are only allowed during business hours (9 AM - 5 PM GMT)',
       };
     }
-    return { allowed: true };
+    return { approved: true };
   }
 }

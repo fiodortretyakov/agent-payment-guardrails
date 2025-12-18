@@ -1,17 +1,17 @@
 import type { PaymentPolicy } from './engine';
-import type { PaymentIntent } from '../models/payment';
+import type { EvaluationResult, PaymentIntent } from '../models/payment';
 
 export class MaxAmountPolicy implements PaymentPolicy {
   name = 'MaxAmountLimit';
   constructor(private limit: number) {}
 
-  validate(intent: PaymentIntent) {
+  validate(intent: PaymentIntent): EvaluationResult {
     if (intent.amount > this.limit) {
       return {
-        allowed: false,
-        error: `Amount ${intent.amount} exceeds limit of ${this.limit}`,
+        approved: false,
+        reason: `Amount ${intent.amount} exceeds limit of ${this.limit}`,
       };
     }
-    return { allowed: true };
+    return { approved: true };
   }
 }

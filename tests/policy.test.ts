@@ -100,8 +100,8 @@ describe('MaxAmountPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.allowed).toBe(true);
-    expect(result.error).toBeUndefined();
+    expect(result.approved).toBe(true);
+    expect(result.reason).toBeUndefined();
   });
 
   test('should BLOCK amounts exceeding limit', () => {
@@ -115,8 +115,8 @@ describe('MaxAmountPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.allowed).toBe(false);
-    expect(result.error).toContain('exceeds limit of 1000');
+    expect(result.approved).toBe(false);
+    expect(result.reason).toContain('exceeds limit of 1000');
   });
 });
 
@@ -134,8 +134,8 @@ describe('CategoryPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.allowed).toBe(true);
-    expect(result.error).toBeUndefined();
+    expect(result.approved).toBe(true);
+    expect(result.reason).toBeUndefined();
   });
 
   test('should BLOCK non-approved categories', () => {
@@ -149,8 +149,8 @@ describe('CategoryPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.allowed).toBe(false);
-    expect(result.error).toContain('not in the approved list');
+    expect(result.approved).toBe(false);
+    expect(result.reason).toContain('not in the approved list');
   });
 });
 
@@ -201,8 +201,8 @@ describe('MaxAmountPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.allowed).toBe(true);
-    expect(result.error).toBeUndefined();
+    expect(result.approved).toBe(true);
+    expect(result.reason).toBeUndefined();
   });
 
   test('should BLOCK amounts exceeding limit', () => {
@@ -216,8 +216,8 @@ describe('MaxAmountPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.allowed).toBe(false);
-    expect(result.error).toContain('exceeds limit of 1000');
+    expect(result.approved).toBe(false);
+    expect(result.reason).toContain('exceeds limit of 1000');
   });
 });
 
@@ -235,8 +235,8 @@ describe('CategoryPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.allowed).toBe(true);
-    expect(result.error).toBeUndefined();
+    expect(result.approved).toBe(true);
+    expect(result.reason).toBeUndefined();
   });
 
   test('should BLOCK non-approved categories', () => {
@@ -250,8 +250,8 @@ describe('CategoryPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.allowed).toBe(false);
-    expect(result.error).toContain('not in the approved list');
+    expect(result.approved).toBe(false);
+    expect(result.reason).toContain('not in the approved list');
   });
 });
 
@@ -305,8 +305,8 @@ describe('TimeBasedPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.allowed).toBe(true);
-    expect(result.error).toBeUndefined();
+    expect(result.approved).toBe(true);
+    expect(result.reason).toBeUndefined();
 
     jest.restoreAllMocks();
   });
@@ -325,8 +325,8 @@ describe('TimeBasedPolicy', () => {
     } as any;
 
     const result = policy.validate(intent);
-    expect(result.allowed).toBe(false);
-    expect(result.error).toContain('business hours');
+    expect(result.approved).toBe(false);
+    expect(result.reason).toContain('business hours');
 
     jest.restoreAllMocks();
   });

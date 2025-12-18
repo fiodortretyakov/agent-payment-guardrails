@@ -1,13 +1,9 @@
-import type { PaymentIntent, EvaluationResult } from '../models/payment';
+import type { PaymentIntent, EvaluationResult, FinalExecutionResult } from '../models/payment';
 import sanitizeHtml from 'sanitize-html';
 
 export interface PaymentPolicy {
   name: string;
-  validate(intent: PaymentIntent): {
-    allowed: boolean;
-    error?: string;
-    requiresHumanApproval?: boolean;
-  };
+  validate(intent: PaymentIntent): EvaluationResult;
 }
 
 export class PolicyEngine {
@@ -15,7 +11,7 @@ export class PolicyEngine {
   // Use a Set to track processed keys in memory
   private processedKeys = new Set<string>();
 
-  evaluate(intent: PaymentIntent): EvaluationResult {
+  evaluate(intent: PaymentIntent): FinalExecutionResult {
     // Check Idempotency first
     if (this.processedKeys.has(intent.idempotencyKey)) {
       return {
@@ -41,10 +37,10 @@ export class PolicyEngine {
     for (const policy of this.policies) {
       const result = policy.validate(intent);
       // 1. If any policy blocks it, stop immediately
-      if (!result.allowed) {
+      if (!result.approved) {
         return {
           approved: false,
-          reason: `Policy '${policy.name}' violated: ${result.error}`,
+          reason: `Policy '${policy.name}' violated: ${result.reason}`,
         };
       }
 
@@ -57,7 +53,7 @@ export class PolicyEngine {
     // If all pass, "commit" the key
     this.processedKeys.add(intent.idempotencyKey);
     return {
-      approved: true,
+      approved: !finalRequiresApproval,
       requiresHumanApproval: finalRequiresApproval,
       reason: finalRequiresApproval ? 'Pending human sign-off' : 'Auto-approved',
     };
