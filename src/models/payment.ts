@@ -27,7 +27,6 @@ export interface EvaluationResult {
 export interface FinalEvaluationResult extends EvaluationResult {
   id: UUID;
   auditTrail: AuditEntry[];
-  isRetryable: boolean;
 }
 
 export enum AuditActor {
