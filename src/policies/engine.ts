@@ -3,7 +3,11 @@ import sanitizeHtml from 'sanitize-html';
 
 export interface PaymentPolicy {
   name: string;
-  validate(intent: PaymentIntent): { allowed: boolean; error?: string };
+  validate(intent: PaymentIntent): {
+    allowed: boolean;
+    error?: string;
+    requiresHumanApproval?: boolean;
+  };
 }
 
 export class PolicyEngine {
@@ -28,16 +32,25 @@ export class PolicyEngine {
     if (cleanJustification !== intent.justification) {
       return {
         approved: false,
-        reason: 'Security Violation: HTML detected in justification'
+        reason: 'Security Violation: HTML detected in justification',
       };
     }
+
+    let finalRequiresApproval = false;
+
     for (const policy of this.policies) {
       const result = policy.validate(intent);
+      // 1. If any policy blocks it, stop immediately
       if (!result.allowed) {
         return {
           approved: false,
           reason: `Policy '${policy.name}' violated: ${result.error}`,
         };
+      }
+
+      // 2. If any policy flags it for human, remember that
+      if (result.requiresHumanApproval) {
+        finalRequiresApproval = true;
       }
     }
 
@@ -45,7 +58,8 @@ export class PolicyEngine {
     this.processedKeys.add(intent.idempotencyKey);
     return {
       approved: true,
-      reason: 'All policies passed.'
+      requiresHumanApproval: finalRequiresApproval,
+      reason: finalRequiresApproval ? 'Pending human sign-off' : 'Auto-approved',
     };
   }
 }
