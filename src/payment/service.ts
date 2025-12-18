@@ -13,7 +13,7 @@ export class MockPaymentService {
     // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 800));
 
-    // Simulate a random "Bank Failure" (Edge case handling!)
+    // Simulate a random "Bank Failure"
     if (Math.random() < 0.1) {
       throw new Error('Bank Connection Timeout');
     }

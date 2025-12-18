@@ -7,7 +7,7 @@ export class MockAgent {
     return {
       goal: 'Equip the new Lead Designer with necessary hardware', // THE GOAL
       idempotencyKey: randomUUID(),
-      amount: 500, // Try changing this to 5000 to test your guardrails!
+      amount: 500, // Try changing this to 5000 to test the guardrails
       currency: 'GBP',
       beneficiary: 'Apple Store London',
       category: 'equipment',
