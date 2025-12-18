@@ -1,7 +1,7 @@
 # Agent Payments Guardrails
 
 [![CI](https://github.com/fiodortretyakov/agent-payment-guardrails/actions/workflows/ci.yml/badge.svg)](https://github.com/fiodortretyakov/agent-payment-guardrails/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/fiodortretyakov/agent-payment-guardrails/branch/main/graph/badge.svg)](https://codecov.io/gh/fiodortretyakov/agent-payment-guardrails)
+[![codecov](https://codecov.io/gh/fiodortretyakov/agent-payment-guardrails/graph/badge.svg?token=7JUE7ZODDF)](https://codecov.io/gh/fiodortretyakov/agent-payment-guardrails)
 
 A safe, policy-driven orchestration system for autonomous AI agents. This repository implements a **"Guardrails First"** architecture, ensuring that AI-generated payment intents are validated against strict financial policies before any transaction is executed.
 
