@@ -26,7 +26,10 @@ export class PolicyEngine {
       allowedAttributes: {},
     });
     if (cleanJustification !== intent.justification) {
-      return { approved: false, reason: 'Security Violation: HTML detected in justification' };
+      return {
+        approved: false,
+        reason: 'Security Violation: HTML detected in justification'
+      };
     }
     for (const policy of this.policies) {
       const result = policy.validate(intent);
@@ -40,6 +43,9 @@ export class PolicyEngine {
 
     // If all pass, "commit" the key
     this.processedKeys.add(intent.idempotencyKey);
-    return { approved: true, reason: 'All policies passed.' };
+    return {
+      approved: true,
+      reason: 'All policies passed.'
+    };
   }
 }

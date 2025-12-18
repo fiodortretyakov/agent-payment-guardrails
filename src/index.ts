@@ -1,6 +1,7 @@
 import { MockAgent } from './agent/mock';
 import { PolicyEngine } from './policies/engine';
 import { MaxAmountPolicy } from './policies/amountPolicy';
+import { DailyBudgetPolicy } from './policies/budgetPolicy';
 import { CategoryPolicy } from './policies/categoryPolicy';
 import { TimeBasedPolicy } from './policies/timePolicy';
 import { MockPaymentService } from './payment/service';
@@ -26,6 +27,7 @@ async function main() {
   // Define Guardrails (e.g., Max limit of 1000 GBP)
   const policyEngine = new PolicyEngine([
     new MaxAmountPolicy(1000),
+    new DailyBudgetPolicy(3000),
     new CategoryPolicy(),
     new TimeBasedPolicy(),
   ]);
@@ -41,14 +43,18 @@ async function main() {
     const decision = policyEngine.evaluate(intent);
 
     if (decision.approved) {
-      logger.info('✅ APPROVED. Proceeding to execution.');
+      if (decision.requiresHumanApproval) {
+        console.log('⏸️ PENDING: This exceeds the autonomous threshold. Sending for approval...');
+        logger.info('⚠️ REQUIRES HUMAN APPROVAL. Reason:', { reason: decision.reason });
+      } else {
+        logger.info('✅ APPROVED. Proceeding to execution.');
 
-      // 4. Execute Payment
-      const receipt = await paymentService.execute(intent);
-      logger.info('🎉 Payment Successful!', { receipt });
+        // 4. Execute Payment
+        const receipt = await paymentService.execute(intent);
+        logger.info('🎉 Payment Successful!', { receipt });
+      }
     } else {
       logger.warn('🛑 BLOCKED. Reason:', { reason: decision.reason });
-      // Requirement #4: Feedback Loop would happen here
     }
   } catch (error) {
     logger.error('💥 System Error:', { error });
