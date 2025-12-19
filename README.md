@@ -53,7 +53,7 @@ I chose TypeScript over JavaScript because, in a payments environment, a **"type
 ---
 
 ### ⚡ Node.js 25: High Performance & Native Security
-* **Non-Blocking I/O:** AI agents are highly concurrent. Node’s event loop allows us to process hundreds of payment proposals simultaneously without the overhead of heavy thread management.
+* **Non-Blocking I/O:** AI agents are highly concurrent. Node’s event loop allows me to process hundreds of payment proposals simultaneously without the overhead of heavy thread management.
 * **Native Crypto:** I utilize the built-in `node:crypto` module for cryptographically secure UUID generation. This reduces our "dependency footprint," keeping the project lean and minimizing supply-chain attack vectors.
 * **Top-Level Await:** Simplifies our orchestration logic, making the code cleaner and more readable for audit purposes.
 
@@ -78,7 +78,7 @@ The `PolicyEngine` does not use a monolithic "if-else" block. Instead, it employ
 ### 🚀 Key Professional Features Included:
 * **Idempotency:** Native support for `idempotencyKey` to prevent double-spending during network retries.
 * **Tiered Approvals:** A "Yellow Zone" (e.g., £500 - £1,000) that automatically flags transactions for human review while allowing lower amounts to pass autonomously.
-* **Traceability:** Every decision generates a unique `evaluationId`, linking the AI's proposal to the final system decision for compliance auditing.
+* **Traceability:** Every decision generates a unique `id`, linking the AI's proposal to the final system decision for compliance auditing.
 
 ## 🏗 Architecture
 
@@ -115,7 +115,7 @@ I implemented a **"Trust but Verify"** approach for the AI Agent.
 The Policy Engine is designed using the **Strategy Pattern**.
 
 - **Decision:** Decoupled the "Engine" (orchestrator) from the "Policies" (rules).
-- **Reasoning:** This allows us to add new complex rules (e.g., `DailySpendLimit`, `SanctionsCheck`) without modifying the core payment logic, adhering to the Open/Closed Principle.
+- **Reasoning:** This allows me to add new complex rules (e.g., `DailySpendLimit`, `SanctionsCheck`) without modifying the core payment logic.
 
 ### 3. Infrastructure as Code (IaC)
 
@@ -160,7 +160,7 @@ The `PolicyEngine` utilizes a **deny-by-default** approach. If an unknown error 
 - **Enhanced Security:** Upgraded HTML sanitization using `sanitize-html` library for better XSS protection.
 - **Structured Logging:** Integrated Winston for JSON-formatted logs with timestamps.
 - **CI/CD Pipeline:** Added GitHub Actions for automated testing, linting, and coverage reporting.
-- **Comprehensive Testing:** 100%+ coverage with unit and integration tests.
+- **Comprehensive Testing:** 97% coverage with unit and integration tests.
 - **TypeScript Strictness:** Enabled strict mode for better type safety.
 
 ## 🔮 Future Improvements (The Roadmap)
