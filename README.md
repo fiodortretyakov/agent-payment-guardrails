@@ -44,17 +44,17 @@ This project is built with **Infrastructure as Code (IaC)** principles. It inclu
 In a fintech context, the choice of tools is driven by the **"Security-First"** principle. Below is the rationale for the architectural decisions made in this project.
 
 ### 🛡️ TypeScript: Type Safety as Financial Safety
-We chose TypeScript over JavaScript because, in a payments environment, a **"type error" is a "financial error."**
+I chose TypeScript over JavaScript because, in a payments environment, a **"type error" is a "financial error."**
 
-* **Strong Typing:** By using `Interfaces` and `Enums` for `PolicyDecision` and `AuditEntry`, we eliminate entire classes of bugs (such as `null` amounts or malformed IDs) before the code even executes.
+* **Strong Typing:** By using `Interfaces` and `Enums` for `PolicyDecision` and `AuditEntry`, i eliminate entire classes of bugs (such as `null` amounts or malformed IDs) before the code even executes.
 * **Self-Documenting Logic:** The code becomes a "source of truth." Any developer (or AI agent) can inspect the types to understand exactly what the system expects.
-* **Modern ESM:** Leveraging native ECMAScript Modules ensures we stay aligned with the latest security standards and performance optimizations.
+* **Modern ESM:** Leveraging native ECMAScript Modules ensures i stay aligned with the latest security standards and performance optimizations.
 
 ---
 
 ### ⚡ Node.js 25: High Performance & Native Security
 * **Non-Blocking I/O:** AI agents are highly concurrent. Node’s event loop allows us to process hundreds of payment proposals simultaneously without the overhead of heavy thread management.
-* **Native Crypto:** We utilize the built-in `node:crypto` module for cryptographically secure UUID generation. This reduces our "dependency footprint," keeping the project lean and minimizing supply-chain attack vectors.
+* **Native Crypto:** I utilize the built-in `node:crypto` module for cryptographically secure UUID generation. This reduces our "dependency footprint," keeping the project lean and minimizing supply-chain attack vectors.
 * **Top-Level Await:** Simplifies our orchestration logic, making the code cleaner and more readable for audit purposes.
 
 ---
@@ -63,7 +63,7 @@ We chose TypeScript over JavaScript because, in a payments environment, a **"typ
 TypeScript validates at compile-time, but **Zod** provides the essential runtime "Guardrail."
 
 * **Input Sanitization:** Every request from an AI agent is treated as untrusted. Zod parses and validates the payload before it ever touches our business logic.
-* **Integer Math (Pence vs. Pounds):** We enforce `.int()` on all amount fields. In fintech, floating-point numbers (e.g., `19.99`) lead to rounding errors. We handle all currency in **minor units** (e.g., `1999` pence) to ensure 100% mathematical accuracy.
+* **Integer Math (Pence vs. Pounds):** I enforce `.int()` on all amount fields. In fintech, floating-point numbers (e.g., `19.99`) lead to rounding errors. I handle all currency in **minor units** (e.g., `1999` pence) to ensure 100% mathematical accuracy.
 
 ---
 
