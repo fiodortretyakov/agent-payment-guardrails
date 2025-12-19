@@ -5,7 +5,6 @@ export class MockAgent {
   // Simulate the agent "thinking" and proposing a payment
   async generateIntent(): Promise<PaymentIntent> {
     return {
-      goal: 'Equip the new Lead Designer with necessary hardware',
       idempotencyKey: randomUUID(),
       amount: 500,
       currency: 'GBP',
